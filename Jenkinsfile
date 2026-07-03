@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    environment {
+        KUBECONFIG = '/etc/rancher/k3s/k3s.yaml'
+    }
+
     stages {
 
         stage('Checkout') {
@@ -32,7 +36,7 @@ pipeline {
                     sh 'docker push siva1606/cast-service:latest'
                 }
             }
-        }  
+        }
 
         stage('Deploy') {
             steps {
