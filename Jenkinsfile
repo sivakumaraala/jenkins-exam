@@ -17,13 +17,26 @@ pipeline {
 
         stage('Push Images') {
             steps {
-                echo 'Push images to DockerHub'
+                withCredentials([usernamePassword(
+                    credentialsId: 'dockerhub',
+                    usernameVariable: 'DOCKER_USER',
+                    passwordVariable: 'DOCKER_PASSWORD'
+                )]) {
+
+                    sh 'echo $DOCKER_PASSWORD | docker login -u $DOCKER_USER --password-stdin'
+
+                    sh 'docker tag jenkins-devops-exam-movie_service siva1606/movie-service:latest'
+                    sh 'docker push siva1606/movie-service:latest'
+
+                    sh 'docker tag jenkins-devops-exam-cast_service siva1606/cast-service:latest'
+                    sh 'docker push siva1606/cast-service:latest'
+                }
             }
-        }
+        }  
 
         stage('Deploy') {
             steps {
-                echo 'Deploy using Helm'
+                sh 'helm upgrade --install fastapiapp ./charts -n dev'
             }
         }
     }
